@@ -1,0 +1,24 @@
+name: Build
+
+on:
+  push:
+
+jobs:
+  logs:
+    name: Lint job
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v1
+      - name: install sdk
+        run: curl -s https://raw.githubusercontent.com/lindell/connect-iq-sdk-manager-cli/master/install.sh | sh
+      - name: backup stats
+        run: | 
+          connect-iq-sdk-manager agreement view
+          connect-iq-sdk-manager agreement accept
+          connect-iq-sdk-manager login
+          connect-iq-sdk-manager sdk set 8.4.1
+      - name: generate key
+        run: | 
+          openssl genrsa -out developer_key.pem 4096
+          openssl pkcs8 -topk8 -inform PEM -outform DER -in developer_key.pem -out developer_key.der -nocrypt
