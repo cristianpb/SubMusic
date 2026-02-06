@@ -19,7 +19,7 @@ jobs:
           cat manifest.xml | grep -oP 'product id="\K[^"]+' | sed 's/.*/"&"/' | paste -sd, - | sed 's/.*/[&]/' | sed 's/.*/devices=&/' >> "$GITHUB_OUTPUT"
 
   logs:
-    name: Lint job
+    name: Build package
     runs-on: ubuntu-latest
     needs: define-matrix
     strategy:
@@ -41,3 +41,10 @@ jobs:
           outputPath: ${{ matrix.device }}.prg
           device: ${{ matrix.device }}
           typeCheck: '0'
+      - name: Upload packages to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ matrix.device }}.prg
+          asset_name: ${{ matrix.device }}.prg
+          tag: ${{ github.ref }}
